@@ -46,7 +46,7 @@ class Log_file:
         self.file_exists = os.path.exists(self.file_route)
         self.column_names = ["batch_number", "start_CP", "end_CP"]
         if self.file_exists and not overwrite:
-            print("The File already exists. Please turn on the overwrite option ")
+            print("That log file already exists. Please turn on the overwrite option ")
             print("when you use the Log_file class if you want a new object. Else dismiss.")
             #self.filename = None
             #self.file_route = None

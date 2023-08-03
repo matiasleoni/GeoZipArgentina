@@ -11,8 +11,8 @@ class CPs_file:
         self.file_exists = os.path.exists(self.file_route)
         self.column_names = ["CP", "Latitude", "Longitude"]
         if self.file_exists and not overwrite:
-            print("The File already exists. Please turn on the overwrite option ")
-            print("when you use the Log_file class if you want a new object. Else dismiss.")
+            print("That coordinates file already exists. Please turn on the overwrite option ")
+            print("when you use the CPs_file class if you want a new object. Else dismiss.")
             return None
         else:
             self.file_exists = True
