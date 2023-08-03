@@ -42,18 +42,19 @@ class Log_file:
                                         Default is False.
         """
         self.filename = filename
-        self.fileroute = "log/"+self.filename
-        self.file_exists = os.path.exists(self.fileroute)
+        self.file_route = "classes/"+self.filename
+        self.file_exists = os.path.exists(self.file_route)
         self.column_names = ["batch_number", "start_CP", "end_CP"]
         if self.file_exists and not overwrite:
-            print("The File already exists. Please turn on the overwrite option when creating the object.")
-            self.filename = None
-            self.fileroute = None
-            self.file_exists = False
+            print("The File already exists. Please turn on the overwrite option ")
+            print("when you use the Log_file class if you want a new object. Else dismiss.")
+            #self.filename = None
+            #self.file_route = None
+            #self.file_exists = False
             return None
         else:
             self.file_exists = True
-            with open(self.fileroute, "w", newline="") as csv_file:
+            with open(self.file_route, "w", newline="") as csv_file:
                 log_writer = csv.writer(csv_file)
                 log_writer.writerow(self.column_names)
 
@@ -64,7 +65,7 @@ class Log_file:
         Returns:
             int or None: The last batch number if it exists, or None if the log file is empty.
         """
-        df = pd.read_csv(self.fileroute)
+        df = pd.read_csv(self.file_route)
         try:
             last_batch_number = df.iloc[-1][self.column_names[0]]
         except IndexError:
@@ -81,7 +82,7 @@ class Log_file:
         Returns:
             bool: True if the batch number exists, False otherwise.
         """
-        df = pd.read_csv(self.fileroute)
+        df = pd.read_csv(self.file_route)
         return batch_number in df[self.column_names[0]].to_list()
 
     def write_entry(self, batch_number, batch_dic):
@@ -99,7 +100,7 @@ class Log_file:
         if self.check_if_batch_exists(batch_number):
             print(f"Entry {batch_number} already exists.")
         else:
-            with open(self.fileroute, "a", newline="") as csv_file:
+            with open(self.file_route, "a", newline="") as csv_file:
                 log_writer = csv.writer(csv_file)
                 log_writer.writerow([batch_number, list(batch_dic.keys())[0], list(batch_dic.keys())[-1]])
 
@@ -110,7 +111,7 @@ class Log_file:
         Returns:
             int: The number of entries in the log file.
         """
-        df = pd.read_csv(self.fileroute)
+        df = pd.read_csv(self.file_route)
         return len(df)
 
     def delete_file(self):
@@ -118,7 +119,7 @@ class Log_file:
         Delete the log file (if it exists).
         """
         if self.file_exists:
-            os.remove(self.fileroute)
+            os.remove(self.file_route)
             self.file_exists = False
         self.filename = None
-        self.fileroute = None
+        self.file_route = None

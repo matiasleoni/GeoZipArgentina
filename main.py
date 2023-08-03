@@ -3,16 +3,22 @@ import json
 import pandas as pd
 import time
 import math 
+import os
+import csv
+from collections import OrderedDict
+
+from classes.log_file import Log_file as Log_file
+from classes.CPs_file import CPs_file as CPs_file
 
 def request_coordinates(CP):
     URL = "https://nominatim.openstreetmap.org/search?postalcode="+str(CP)+"&country=Argentina&format=geojson"
     my_request = requests.get(URL)
-    #print("Request answer: ")
-    #print(my_request.text)
-
-    adic = json.loads(my_request.text)
-    answer = adic['features'][0]['geometry']['coordinates']
-    answer.reverse()
+    json_full_answer = json.loads(my_request.text)
+    try:
+        answer = json_full_answer['features'][0]['geometry']['coordinates']
+        answer.reverse()
+    except IndexError:
+        answer = [float("nan")]*2
     return answer
 
 def partition(number_of_CPs = 3448, batch_size = 30):
@@ -28,6 +34,48 @@ def batcher(CPs, batch_size):
 
     batched_CPs = [CPs[slice(*index_partition[batch_index])] for batch_index in range(len(index_partition))]
     return batched_CPs
+
+def process_batch(batch):
+    return_dic = OrderedDict()
+    for CP in batch:
+        coordinates = request_coordinates(CP)
+        return_dic[CP] = coordinates
+    return return_dic
+
+def scrap_step(batched_CPs, the_log_file, the_CPs_file):
+    last_batch_number = the_log_file.check_last_batch()
+    if last_batch_number is None:
+        last_batch_number = -1
+    batch = batched_CPs[last_batch_number+1]
+    return_dic = process_batch(batch)
+
+    if not the_log_file.check_if_batch_exists(last_batch_number+1):
+        the_CPs_file.write_entry(return_dic)
+    the_log_file.write_entry(last_batch_number+1,return_dic)
+
+    print(f"batch {last_batch_number+1} computed")
+    return return_dic
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
